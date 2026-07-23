@@ -1,0 +1,6 @@
+{
+  "name": "Global Headlines",
+  "description": "A modern news app displaying 5 international headlines with offline caching and dark mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

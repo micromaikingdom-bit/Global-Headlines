@@ -9,5 +9,6 @@ data class NewsArticle(
     val title: String,
     val summary: String,
     val fullText: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val url: String = ""
 )

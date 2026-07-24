@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         val db = Room.databaseBuilder(
             applicationContext,
             NewsDatabase::class.java, "news-database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
         
         val repository = NewsRepository(db.newsDao())
         

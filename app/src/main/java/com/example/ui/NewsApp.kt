@@ -163,6 +163,17 @@ fun NewsCard(article: NewsArticle) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.2
                     )
+                    
+                    if (article.url.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+                        TextButton(
+                            onClick = { uriHandler.openUri(article.url) },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text("阅读全文")
+                        }
+                    }
                 }
             }
         }

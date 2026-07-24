@@ -10,8 +10,8 @@ import java.util.UUID
 class NewsRepository(private val newsDao: NewsDao) {
     val allNews: Flow<List<NewsArticle>> = newsDao.getAllNews()
 
-    suspend fun refreshNews(force: Boolean = false) {
-        withContext(Dispatchers.IO) {
+    suspend fun refreshNews(force: Boolean = false): Boolean {
+        return withContext(Dispatchers.IO) {
             val count = newsDao.getCount()
             if (force || count == 0) {
                 try {
@@ -21,12 +21,20 @@ class NewsRepository(private val newsDao: NewsDao) {
                             if (force) newsDao.clearAll()
                             insertMockData()
                         }
-                        return@withContext
+                        return@withContext false
                     }
                     
                     val response = RetrofitClient.service.getTopHeadlines(apiKey = apiKey, max = 5)
                     
                     if (response.articles.isNotEmpty()) {
+                        val currentNews = newsDao.getAllNewsSync()
+                        val currentTitles = currentNews.map { it.title }.toSet()
+                        val newTitles = response.articles.map { it.title }.toSet()
+                        
+                        if (currentTitles.isNotEmpty() && currentTitles.containsAll(newTitles)) {
+                            return@withContext false
+                        }
+
                         val newsList = response.articles.map { article ->
                             NewsArticle(
                                 id = UUID.randomUUID().toString(),
@@ -42,9 +50,11 @@ class NewsRepository(private val newsDao: NewsDao) {
                             newsDao.clearAll()
                         }
                         newsDao.insertAll(newsList)
+                        return@withContext true
                     } else if (count == 0 || force) {
                         if (force) newsDao.clearAll()
                         insertMockData()
+                        return@withContext false
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -53,8 +63,10 @@ class NewsRepository(private val newsDao: NewsDao) {
                         if (force) newsDao.clearAll()
                         insertMockData()
                     }
+                    return@withContext false
                 }
             }
+            return@withContext false
         }
     }
 

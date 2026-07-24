@@ -28,11 +28,12 @@ class NewsViewModel(private val repository: NewsRepository) : ViewModel() {
         refresh()
     }
 
-    fun refresh(force: Boolean = false) {
+    fun refresh(force: Boolean = false, onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.refreshNews(force)
+                val updated = repository.refreshNews(force)
+                onResult(updated)
             } finally {
                 _isLoading.value = false
             }

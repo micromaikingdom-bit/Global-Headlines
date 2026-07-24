@@ -17,6 +17,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ fun NewsApp(
 ) {
     val newsList by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -42,7 +45,13 @@ fun NewsApp(
                 title = { Text("Global Headlines", fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.refresh(force = true) },
+                        onClick = { 
+                            viewModel.refresh(force = true) { updated ->
+                                if (!updated) {
+                                    Toast.makeText(context, "当前已是最新头版新闻", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        },
                         modifier = Modifier.testTag("refresh_button"),
                         enabled = !isLoading
                     ) {

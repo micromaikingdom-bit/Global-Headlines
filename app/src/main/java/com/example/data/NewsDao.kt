@@ -11,6 +11,9 @@ interface NewsDao {
     @Query("SELECT * FROM news_articles ORDER BY timestamp DESC")
     fun getAllNews(): Flow<List<NewsArticle>>
 
+    @Query("SELECT * FROM news_articles ORDER BY timestamp DESC")
+    suspend fun getAllNewsSync(): List<NewsArticle>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(articles: List<NewsArticle>)
     
